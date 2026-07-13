@@ -15,7 +15,7 @@ interface Acompanhante {
   email: string
 }
 
-interface FormData {
+interface DadosFormulario {
   tipoInscricao: 'individual' | 'dupla' | ''
   nome: string
   email: string
@@ -54,7 +54,7 @@ const acompanhanteVazio = (): Acompanhante => ({
   nome: '', rg: '', sexo: '', whatsapp: '', email: '',
 })
 
-const initialData: FormData = {
+const initialData: DadosFormulario = {
   tipoInscricao: '',
   nome: '', email: '', whatsapp: '', nacionalidade: 'Brasil',
   cpf: '', estadoCivil: '', rg: '', orgaoEmissor: '',
@@ -595,18 +595,17 @@ function BtnVoltar({ onClick }: { onClick: () => void }) {
 /* ══════════════════════════════════════════════════════════════════ */
 export default function ExpedicaoForm() {
   const [step, setStep]       = useState(0)
-  const [data, setData]       = useState<FormData>(initialData)
+  const [data, setData]       = useState<DadosFormulario>(initialData)
   const [enviado, setEnviado] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [erroEnvio, setErroEnvio] = useState(false)
-  const [avisoDocumentos, setAvisoDocumentos] = useState(false)
   const [erroValidacao, setErroValidacao] = useState('')
   const [errors, setErrors] = useState<Errors>({})
   const [shakeNonce, setShakeNonce] = useState(0)
   const topRef = useRef<HTMLDivElement>(null)
   const fieldRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
-  const set = (field: keyof FormData, value: unknown) =>
+  const set = (field: keyof DadosFormulario, value: unknown) =>
     setData(p => ({ ...p, [field]: value }))
 
   const setAcomp = (field: keyof Acompanhante, value: string) =>
@@ -799,63 +798,28 @@ export default function ExpedicaoForm() {
     }
   }
 
-  // Chave de acesso do Web3Forms (gerada no painel deles)
-  const WEB3FORMS_ACCESS_KEY = '8ce06a67-3dd3-4dd2-9961-adbbe0618d67'
-  const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit'
+  const BASIN_ENDPOINT = 'https://usebasin.com/f/80e03fc53775'
 
   const handleEnviar = async () => {
     setEnviando(true)
     setErroEnvio(false)
-    setAvisoDocumentos(false)
-
-    const temArquivos = !!(data.docCnh || data.docVeiculo)
 
     try {
-      // 1ª tentativa: com os arquivos anexados (Web3Forms aceita anexos, com limite de tamanho por arquivo)
-      if (temArquivos) {
-        const formDataComArquivos = new FormData()
-        formDataComArquivos.append('access_key', WEB3FORMS_ACCESS_KEY)
-        formDataComArquivos.append('subject', `Nova inscrição — ${data.nome} (Campos do Jordão)`)
-        montarCamposTexto(formDataComArquivos)
-        if (data.docCnh) formDataComArquivos.append('Documento CNH', data.docCnh)
-        if (data.docVeiculo) formDataComArquivos.append('Documento do Veículo', data.docVeiculo)
+      const formData = new FormData()
+      montarCamposTexto(formData)
+      if (data.docCnh) formData.append('Documento CNH', data.docCnh)
+      if (data.docVeiculo) formData.append('Documento do Veículo', data.docVeiculo)
 
-        // Não definir headers/content-type: o navegador cuida disso no multipart/form-data
-        const respComArquivos = await fetch(WEB3FORMS_ENDPOINT, {
-          method: 'POST',
-          body: formDataComArquivos,
-        })
-        const jsonComArquivos = await respComArquivos.json()
-
-        if (respComArquivos.ok && jsonComArquivos.success) {
-          setEnviando(false)
-          setEnviado(true)
-          scrollTop()
-          return
-        }
-        // Se falhou (ex: arquivo grande demais, ou conta sem upload liberado), cai para o fallback abaixo
-        console.warn('Envio com arquivos falhou, tentando sem anexos...', jsonComArquivos)
-      }
-
-      // 2ª tentativa (ou única, se não há arquivos): só os dados de texto
-      const formDataSemArquivos = new FormData()
-      formDataSemArquivos.append('access_key', WEB3FORMS_ACCESS_KEY)
-      formDataSemArquivos.append('subject', `Nova inscrição — ${data.nome} (Campos do Jordão)`)
-      montarCamposTexto(formDataSemArquivos)
-      if (data.docCnh) formDataSemArquivos.append('Nome do arquivo - Documento CNH', data.docCnh.name)
-      if (data.docVeiculo) formDataSemArquivos.append('Nome do arquivo - Documento Veículo', data.docVeiculo.name)
-
-      const resp = await fetch(WEB3FORMS_ENDPOINT, {
+      const resp = await fetch(BASIN_ENDPOINT, {
         method: 'POST',
-        body: formDataSemArquivos,
+        body: formData,
+        headers: { Accept: 'application/json' },
       })
-      const json = await resp.json()
 
-      if (!resp.ok || !json.success) throw new Error('Falha no envio')
+      if (!resp.ok) throw new Error('Falha no envio')
 
       setEnviando(false)
       setEnviado(true)
-      if (temArquivos) setAvisoDocumentos(true)
       scrollTop()
     } catch (err) {
       console.error(err)
@@ -884,11 +848,6 @@ export default function ExpedicaoForm() {
           </div>
           <motion.h2 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }} style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, fontSize: 'clamp(2rem,5vw,3rem)', color: '#0A0A0A', lineHeight: 0.95, letterSpacing: '-0.025em', marginBottom: '1.25rem' }}>INSCRIÇÃO ENVIADA!</motion.h2>
           <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }} style={{ color: '#777', fontSize: '1rem', lineHeight: 1.8, marginBottom: '2rem' }}>Recebemos sua inscrição para a expedição de <strong style={{ color: '#0A0A0A' }}>Campos do Jordão</strong>. Nossa equipe entrará em contato em breve com os detalhes e o valor final conforme o número de acompanhantes.</motion.p>
-          {avisoDocumentos && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ padding: '1rem 1.25rem', background: 'rgba(255,123,0,0.06)', border: '1px solid rgba(255,123,0,0.2)', textAlign: 'left', marginBottom: '2rem' }}>
-              <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}>📎 Sua inscrição foi enviada, mas os documentos (CNH e/ou veículo) não puderam ser anexados automaticamente. Nossa equipe vai entrar em contato para que você envie esses arquivos por WhatsApp.</p>
-            </motion.div>
-          )}
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.75 }} style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: '#BBB' }}>Você já pode fechar esta guia</motion.p>
         </motion.div>
       </div>
