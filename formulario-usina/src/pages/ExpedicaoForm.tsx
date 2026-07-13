@@ -599,6 +599,7 @@ export default function ExpedicaoForm() {
   const [enviado, setEnviado] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [erroEnvio, setErroEnvio] = useState(false)
+  const [avisoDocumentos, setAvisoDocumentos] = useState(false)
   const [erroValidacao, setErroValidacao] = useState('')
   const [errors, setErrors] = useState<Errors>({})
   const [shakeNonce, setShakeNonce] = useState(0)
@@ -692,13 +693,17 @@ export default function ExpedicaoForm() {
     const e: Errors = {}
     if (!data.temVeiculo) e.temVeiculo = 'Selecione uma opção.'
 
-    if (data.temVeiculo === 'sim') {
+    // CNH é exigida em ambos os casos (tendo veículo próprio ou precisando alugar)
+    if (data.temVeiculo === 'sim' || data.temVeiculo === 'nao') {
       if (data.numeroCnh.replace(/\D/g, '').length !== 11) e.numeroCnh = 'Informe um número de CNH válido (11 dígitos).'
+      if (!data.docCnh) e.docCnh = 'Envie o documento da CNH.'
+    }
+
+    if (data.temVeiculo === 'sim') {
       if (!data.modeloVeiculo.trim() || data.modeloVeiculo.trim().length < 2) e.modeloVeiculo = 'Informe o modelo do UTV ou Quadriciclo.'
       const anoNum = parseInt(data.anoVeiculo, 10)
       const anoAtual = new Date().getFullYear()
       if (data.anoVeiculo.length !== 4 || isNaN(anoNum) || anoNum < 1980 || anoNum > anoAtual + 1) e.anoVeiculo = 'Informe um ano de fabricação válido.'
-      if (!data.docCnh) e.docCnh = 'Envie o documento da CNH.'
     }
 
     if (data.temVeiculo === 'nao') {
@@ -742,77 +747,115 @@ export default function ExpedicaoForm() {
   const prevStep = () => { setErrors({}); setErroValidacao(''); setStep(p => p - 1); scrollTop() }
 
   /* ── Envio para o Formspree ──────────────────────────────────── */
+  // Monta os campos de texto (sempre enviados)
+  const montarCamposTexto = (formData: FormData) => {
+    formData.append('_subject', `Nova inscrição — ${data.nome} (Campos do Jordão)`)
+
+    formData.append('Tipo de Inscrição', data.tipoInscricao === 'individual' ? 'Piloto Individual' : 'Piloto + Acompanhante')
+    formData.append('Nome', data.nome)
+    formData.append('Email', data.email)
+    formData.append('WhatsApp', data.whatsapp)
+    formData.append('Nacionalidade', data.nacionalidade)
+    formData.append('CPF', data.cpf)
+    formData.append('Estado Civil', data.estadoCivil)
+    formData.append('RG', data.rg)
+    formData.append('Órgão Emissor', data.orgaoEmissor)
+
+    formData.append('Endereço', `${data.endereco}, ${data.numero}${data.complemento ? ' - ' + data.complemento : ''}, ${data.bairro}, ${data.estado} - CEP ${data.cep}`)
+
+    formData.append('Como chegou', data.comoChegou === 'Outro' ? `Outro: ${data.comoChegouOutro}` : data.comoChegou)
+
+    if (data.tipoInscricao === 'dupla') {
+      formData.append('Acompanhante Principal - Nome', data.acompanhante.nome)
+      formData.append('Acompanhante Principal - RG', data.acompanhante.rg)
+      formData.append('Acompanhante Principal - Sexo', data.acompanhante.sexo)
+      formData.append('Acompanhante Principal - WhatsApp', data.acompanhante.whatsapp)
+      formData.append('Acompanhante Principal - Email', data.acompanhante.email)
+
+      data.acompanhantesAdicionais.forEach((ac, i) => {
+        formData.append(`Acompanhante Adicional ${i + 1} - Nome`, ac.nome)
+        formData.append(`Acompanhante Adicional ${i + 1} - RG`, ac.rg)
+        formData.append(`Acompanhante Adicional ${i + 1} - Sexo`, ac.sexo)
+        formData.append(`Acompanhante Adicional ${i + 1} - WhatsApp`, ac.whatsapp)
+        formData.append(`Acompanhante Adicional ${i + 1} - Email`, ac.email)
+      })
+    }
+
+    formData.append('Possui veículo próprio', data.temVeiculo === 'sim' ? 'Sim' : 'Não')
+
+    // Número da CNH é exigido em ambos os casos
+    formData.append('Número CNH', data.numeroCnh)
+
+    if (data.temVeiculo === 'sim') {
+      formData.append('Modelo do veículo', data.modeloVeiculo)
+      formData.append('Ano do veículo', data.anoVeiculo)
+    } else if (data.temVeiculo === 'nao') {
+      formData.append('Tipo de Locação', data.tipoLocacao)
+      if (data.tipoLocacao === 'personalizado') {
+        formData.append('Qtd. Quadriciclos', String(data.qtdQuadriciclos))
+        formData.append('Qtd. UTVs', String(data.qtdUtvs))
+        formData.append('Observações Locação', data.observacaoLocacao)
+      }
+    }
+  }
+
+  // Chave de acesso do Web3Forms (gerada no painel deles)
+  const WEB3FORMS_ACCESS_KEY = '8ce06a67-3dd3-4dd2-9961-adbbe0618d67'
+  const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit'
+
   const handleEnviar = async () => {
     setEnviando(true)
     setErroEnvio(false)
+    setAvisoDocumentos(false)
+
+    const temArquivos = !!(data.docCnh || data.docVeiculo)
 
     try {
-      const formData = new FormData()
+      // 1ª tentativa: com os arquivos anexados (Web3Forms aceita anexos, com limite de tamanho por arquivo)
+      if (temArquivos) {
+        const formDataComArquivos = new FormData()
+        formDataComArquivos.append('access_key', WEB3FORMS_ACCESS_KEY)
+        formDataComArquivos.append('subject', `Nova inscrição — ${data.nome} (Campos do Jordão)`)
+        montarCamposTexto(formDataComArquivos)
+        if (data.docCnh) formDataComArquivos.append('Documento CNH', data.docCnh)
+        if (data.docVeiculo) formDataComArquivos.append('Documento do Veículo', data.docVeiculo)
 
-      // Assunto do e-mail que você recebe
-      formData.append('_subject', `Nova inscrição — ${data.nome} (Campos do Jordão)`)
-
-      // Dados do piloto
-      formData.append('Tipo de Inscrição', data.tipoInscricao === 'individual' ? 'Piloto Individual' : 'Piloto + Acompanhante')
-      formData.append('Nome', data.nome)
-      formData.append('Email', data.email)
-      formData.append('WhatsApp', data.whatsapp)
-      formData.append('Nacionalidade', data.nacionalidade)
-      formData.append('CPF', data.cpf)
-      formData.append('Estado Civil', data.estadoCivil)
-      formData.append('RG', data.rg)
-      formData.append('Órgão Emissor', data.orgaoEmissor)
-
-      // Endereço
-      formData.append('Endereço', `${data.endereco}, ${data.numero}${data.complemento ? ' - ' + data.complemento : ''}, ${data.bairro}, ${data.estado} - CEP ${data.cep}`)
-
-      // Como chegou
-      formData.append('Como chegou', data.comoChegou === 'Outro' ? `Outro: ${data.comoChegouOutro}` : data.comoChegou)
-
-      // Acompanhantes
-      if (data.tipoInscricao === 'dupla') {
-        formData.append('Acompanhante Principal - Nome', data.acompanhante.nome)
-        formData.append('Acompanhante Principal - RG', data.acompanhante.rg)
-        formData.append('Acompanhante Principal - Sexo', data.acompanhante.sexo)
-        formData.append('Acompanhante Principal - WhatsApp', data.acompanhante.whatsapp)
-        formData.append('Acompanhante Principal - Email', data.acompanhante.email)
-
-        data.acompanhantesAdicionais.forEach((ac, i) => {
-          formData.append(`Acompanhante Adicional ${i + 1} - Nome`, ac.nome)
-          formData.append(`Acompanhante Adicional ${i + 1} - RG`, ac.rg)
-          formData.append(`Acompanhante Adicional ${i + 1} - Sexo`, ac.sexo)
-          formData.append(`Acompanhante Adicional ${i + 1} - WhatsApp`, ac.whatsapp)
-          formData.append(`Acompanhante Adicional ${i + 1} - Email`, ac.email)
+        // Não definir headers/content-type: o navegador cuida disso no multipart/form-data
+        const respComArquivos = await fetch(WEB3FORMS_ENDPOINT, {
+          method: 'POST',
+          body: formDataComArquivos,
         })
-      }
+        const jsonComArquivos = await respComArquivos.json()
 
-      // Veículo
-      formData.append('Possui veículo próprio', data.temVeiculo === 'sim' ? 'Sim' : 'Não')
-      if (data.temVeiculo === 'sim') {
-        formData.append('Número CNH', data.numeroCnh)
-        formData.append('Modelo do veículo', data.modeloVeiculo)
-        formData.append('Ano do veículo', data.anoVeiculo)
-        if (data.docCnh) formData.append('Documento CNH', data.docCnh)
-        if (data.docVeiculo) formData.append('Documento do Veículo', data.docVeiculo)
-      } else if (data.temVeiculo === 'nao') {
-        formData.append('Tipo de Locação', data.tipoLocacao)
-        if (data.tipoLocacao === 'personalizado') {
-          formData.append('Qtd. Quadriciclos', String(data.qtdQuadriciclos))
-          formData.append('Qtd. UTVs', String(data.qtdUtvs))
-          formData.append('Observações Locação', data.observacaoLocacao)
+        if (respComArquivos.ok && jsonComArquivos.success) {
+          setEnviando(false)
+          setEnviado(true)
+          scrollTop()
+          return
         }
+        // Se falhou (ex: arquivo grande demais, ou conta sem upload liberado), cai para o fallback abaixo
+        console.warn('Envio com arquivos falhou, tentando sem anexos...', jsonComArquivos)
       }
 
-      const response = await fetch('https://formspree.io/f/mdaqojgb', {
-        method: 'POST',
-        body: formData,
-        headers: { Accept: 'application/json' },
-      })
+      // 2ª tentativa (ou única, se não há arquivos): só os dados de texto
+      const formDataSemArquivos = new FormData()
+      formDataSemArquivos.append('access_key', WEB3FORMS_ACCESS_KEY)
+      formDataSemArquivos.append('subject', `Nova inscrição — ${data.nome} (Campos do Jordão)`)
+      montarCamposTexto(formDataSemArquivos)
+      if (data.docCnh) formDataSemArquivos.append('Nome do arquivo - Documento CNH', data.docCnh.name)
+      if (data.docVeiculo) formDataSemArquivos.append('Nome do arquivo - Documento Veículo', data.docVeiculo.name)
 
-      if (!response.ok) throw new Error('Falha no envio')
+      const resp = await fetch(WEB3FORMS_ENDPOINT, {
+        method: 'POST',
+        body: formDataSemArquivos,
+      })
+      const json = await resp.json()
+
+      if (!resp.ok || !json.success) throw new Error('Falha no envio')
 
       setEnviando(false)
       setEnviado(true)
+      if (temArquivos) setAvisoDocumentos(true)
       scrollTop()
     } catch (err) {
       console.error(err)
@@ -841,6 +884,11 @@ export default function ExpedicaoForm() {
           </div>
           <motion.h2 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }} style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, fontSize: 'clamp(2rem,5vw,3rem)', color: '#0A0A0A', lineHeight: 0.95, letterSpacing: '-0.025em', marginBottom: '1.25rem' }}>INSCRIÇÃO ENVIADA!</motion.h2>
           <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }} style={{ color: '#777', fontSize: '1rem', lineHeight: 1.8, marginBottom: '2rem' }}>Recebemos sua inscrição para a expedição de <strong style={{ color: '#0A0A0A' }}>Campos do Jordão</strong>. Nossa equipe entrará em contato em breve com os detalhes e o valor final conforme o número de acompanhantes.</motion.p>
+          {avisoDocumentos && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.6, ease: [0.16, 1, 0.3, 1] }} style={{ padding: '1rem 1.25rem', background: 'rgba(255,123,0,0.06)', border: '1px solid rgba(255,123,0,0.2)', textAlign: 'left', marginBottom: '2rem' }}>
+              <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}>📎 Sua inscrição foi enviada, mas os documentos (CNH e/ou veículo) não puderam ser anexados automaticamente. Nossa equipe vai entrar em contato para que você envie esses arquivos por WhatsApp.</p>
+            </motion.div>
+          )}
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.75 }} style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: '#BBB' }}>Você já pode fechar esta guia</motion.p>
         </motion.div>
       </div>
@@ -1066,14 +1114,27 @@ export default function ExpedicaoForm() {
                   </AnimatePresence>
                 </div>
 
-                {/* Campos condicionais — só aparecem se a resposta for "Sim" */}
+                {/* Campos de CNH — aparecem tanto em "Sim" quanto em "Não" (locação também exige CNH) */}
                 <AnimatePresence>
-                  {data.temVeiculo === 'sim' && (
-                    <motion.div key="veiculo-fields" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} style={{ overflow: 'hidden' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem', marginBottom: '1.5rem', paddingTop: '0.5rem' }}>
+                  {(data.temVeiculo === 'sim' || data.temVeiculo === 'nao') && (
+                    <motion.div key="cnh-fields" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} style={{ overflow: 'hidden' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem', marginBottom: '1rem', paddingTop: '0.5rem' }}>
                         <Field label="Número da CNH" required error={errors.numeroCnh} fieldRef={el => { fieldRefs.current['numeroCnh'] = el }}>
                           <Input value={data.numeroCnh} onChange={v => set('numeroCnh', v)} placeholder="Número da CNH" mask="cnh" error={!!errors.numeroCnh} shakeNonce={shakeNonce} />
                         </Field>
+                        <div ref={el => { fieldRefs.current['docCnh'] = el }}>
+                          <FileInput label="Documento da CNH" required value={data.docCnh} onChange={f => set('docCnh', f)} error={!!errors.docCnh} />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Campos condicionais — só aparecem se a resposta for "Sim" (dados do veículo próprio) */}
+                <AnimatePresence>
+                  {data.temVeiculo === 'sim' && (
+                    <motion.div key="veiculo-fields" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} style={{ overflow: 'hidden' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
                         <Field label="Modelo do UTV ou Quadriciclo" required error={errors.modeloVeiculo} fieldRef={el => { fieldRefs.current['modeloVeiculo'] = el }}>
                           <Input value={data.modeloVeiculo} onChange={v => set('modeloVeiculo', v)} placeholder="Ex: Can-Am Maverick X3" error={!!errors.modeloVeiculo} shakeNonce={shakeNonce} />
                         </Field>
@@ -1082,9 +1143,6 @@ export default function ExpedicaoForm() {
                         </Field>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-                        <div ref={el => { fieldRefs.current['docCnh'] = el }}>
-                          <FileInput label="Documento da CNH" required value={data.docCnh} onChange={f => set('docCnh', f)} error={!!errors.docCnh} />
-                        </div>
                         <FileInput label="Documento do UTV ou Quadriciclo" value={data.docVeiculo} onChange={f => set('docVeiculo', f)} />
                       </div>
                     </motion.div>
@@ -1206,12 +1264,16 @@ export default function ExpedicaoForm() {
                   </div>
                   <div style={{ border: '1px solid #EBEBEB', padding: '1.25rem' }}>
                     <RevisaoLinha label="Veículo próprio" value={data.temVeiculo === 'sim' ? 'Sim' : data.temVeiculo === 'nao' ? 'Não — locação' : ''} />
-                    {data.temVeiculo === 'sim' && (
+                    {(data.temVeiculo === 'sim' || data.temVeiculo === 'nao') && (
                       <>
                         <RevisaoLinha label="CNH" value={data.numeroCnh} />
+                        <RevisaoLinha label="Doc. CNH" value={data.docCnh?.name || ''} />
+                      </>
+                    )}
+                    {data.temVeiculo === 'sim' && (
+                      <>
                         <RevisaoLinha label="Modelo" value={data.modeloVeiculo} />
                         <RevisaoLinha label="Ano" value={data.anoVeiculo} />
-                        <RevisaoLinha label="Doc. CNH" value={data.docCnh?.name || ''} />
                         <RevisaoLinha label="Doc. Veículo" value={data.docVeiculo?.name || ''} />
                       </>
                     )}
