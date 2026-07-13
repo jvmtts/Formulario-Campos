@@ -598,6 +598,7 @@ export default function ExpedicaoForm() {
   const [data, setData]       = useState<FormData>(initialData)
   const [enviado, setEnviado] = useState(false)
   const [enviando, setEnviando] = useState(false)
+  const [erroEnvio, setErroEnvio] = useState(false)
   const [erroValidacao, setErroValidacao] = useState('')
   const [errors, setErrors] = useState<Errors>({})
   const [shakeNonce, setShakeNonce] = useState(0)
@@ -740,12 +741,84 @@ export default function ExpedicaoForm() {
 
   const prevStep = () => { setErrors({}); setErroValidacao(''); setStep(p => p - 1); scrollTop() }
 
+  /* ── Envio para o Formspree ──────────────────────────────────── */
   const handleEnviar = async () => {
     setEnviando(true)
-    await new Promise(r => setTimeout(r, 1800))
-    setEnviando(false)
-    setEnviado(true)
-    scrollTop()
+    setErroEnvio(false)
+
+    try {
+      const formData = new FormData()
+
+      // Assunto do e-mail que você recebe
+      formData.append('_subject', `Nova inscrição — ${data.nome} (Campos do Jordão)`)
+
+      // Dados do piloto
+      formData.append('Tipo de Inscrição', data.tipoInscricao === 'individual' ? 'Piloto Individual' : 'Piloto + Acompanhante')
+      formData.append('Nome', data.nome)
+      formData.append('Email', data.email)
+      formData.append('WhatsApp', data.whatsapp)
+      formData.append('Nacionalidade', data.nacionalidade)
+      formData.append('CPF', data.cpf)
+      formData.append('Estado Civil', data.estadoCivil)
+      formData.append('RG', data.rg)
+      formData.append('Órgão Emissor', data.orgaoEmissor)
+
+      // Endereço
+      formData.append('Endereço', `${data.endereco}, ${data.numero}${data.complemento ? ' - ' + data.complemento : ''}, ${data.bairro}, ${data.estado} - CEP ${data.cep}`)
+
+      // Como chegou
+      formData.append('Como chegou', data.comoChegou === 'Outro' ? `Outro: ${data.comoChegouOutro}` : data.comoChegou)
+
+      // Acompanhantes
+      if (data.tipoInscricao === 'dupla') {
+        formData.append('Acompanhante Principal - Nome', data.acompanhante.nome)
+        formData.append('Acompanhante Principal - RG', data.acompanhante.rg)
+        formData.append('Acompanhante Principal - Sexo', data.acompanhante.sexo)
+        formData.append('Acompanhante Principal - WhatsApp', data.acompanhante.whatsapp)
+        formData.append('Acompanhante Principal - Email', data.acompanhante.email)
+
+        data.acompanhantesAdicionais.forEach((ac, i) => {
+          formData.append(`Acompanhante Adicional ${i + 1} - Nome`, ac.nome)
+          formData.append(`Acompanhante Adicional ${i + 1} - RG`, ac.rg)
+          formData.append(`Acompanhante Adicional ${i + 1} - Sexo`, ac.sexo)
+          formData.append(`Acompanhante Adicional ${i + 1} - WhatsApp`, ac.whatsapp)
+          formData.append(`Acompanhante Adicional ${i + 1} - Email`, ac.email)
+        })
+      }
+
+      // Veículo
+      formData.append('Possui veículo próprio', data.temVeiculo === 'sim' ? 'Sim' : 'Não')
+      if (data.temVeiculo === 'sim') {
+        formData.append('Número CNH', data.numeroCnh)
+        formData.append('Modelo do veículo', data.modeloVeiculo)
+        formData.append('Ano do veículo', data.anoVeiculo)
+        if (data.docCnh) formData.append('Documento CNH', data.docCnh)
+        if (data.docVeiculo) formData.append('Documento do Veículo', data.docVeiculo)
+      } else if (data.temVeiculo === 'nao') {
+        formData.append('Tipo de Locação', data.tipoLocacao)
+        if (data.tipoLocacao === 'personalizado') {
+          formData.append('Qtd. Quadriciclos', String(data.qtdQuadriciclos))
+          formData.append('Qtd. UTVs', String(data.qtdUtvs))
+          formData.append('Observações Locação', data.observacaoLocacao)
+        }
+      }
+
+      const response = await fetch('https://formspree.io/f/mdaqojgb', {
+        method: 'POST',
+        body: formData,
+        headers: { Accept: 'application/json' },
+      })
+
+      if (!response.ok) throw new Error('Falha no envio')
+
+      setEnviando(false)
+      setEnviado(true)
+      scrollTop()
+    } catch (err) {
+      console.error(err)
+      setEnviando(false)
+      setErroEnvio(true)
+    }
   }
 
   const totalAcomp = data.tipoInscricao === 'dupla' ? 1 + data.acompanhantesAdicionais.length : 0
@@ -1160,6 +1233,14 @@ export default function ExpedicaoForm() {
                 <div style={{ padding: '1.25rem', background: 'rgba(255,123,0,0.06)', border: '1px solid rgba(255,123,0,0.2)', marginBottom: '2rem' }}>
                   <p style={{ fontSize: '0.875rem', color: '#555', lineHeight: 1.7, fontFamily: "'Inter', sans-serif" }}>✅ Ao finalizar, nossa equipe entrará em contato com o <strong style={{ color: '#0A0A0A' }}>valor final</strong> baseado no número de acompanhantes e com as instruções de pagamento.</p>
                 </div>
+
+                <AnimatePresence>
+                  {erroEnvio && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', fontSize: '0.8rem', fontFamily: "'Inter', sans-serif", marginBottom: '1rem', justifyContent: 'flex-end' }}>
+                      <AlertCircle size={14} /> Não foi possível enviar sua inscrição. Verifique sua internet e tente novamente.
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <BtnVoltar onClick={prevStep} />
