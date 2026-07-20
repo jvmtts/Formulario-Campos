@@ -368,7 +368,7 @@ function CountrySelect({ value, onChange, error, shakeNonce }: { value: string, 
   return (
     <ShakeWrap error={error} shakeNonce={shakeNonce}>
       <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
-        {/* Botão principal de exibição — clicar de novo agora FECHA o dropdown */}
+        {/* Botão principal de exibição */}
         <div
           onClick={() => setIsOpen(o => { const next = !o; if (o) setSearch(''); return next })}
           style={{
@@ -863,10 +863,77 @@ export default function ExpedicaoForm() {
           <img src="/images/CamposFormulario.png" alt="Campos do Jordão" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0.15) 100%)' }} />
         </div>
-        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1400px', margin: '0 auto', padding: '0 clamp(1.5rem, 5vw, 7rem)' }}>
-          <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' as const, color: '#FF7B00', display: 'block', marginBottom: '0.75rem' }}>4ª Expedição · Agosto 2026</motion.span>
-          <motion.h1 initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }} style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, fontSize: 'clamp(2.8rem,8vw,6.5rem)', color: '#fff', lineHeight: 0.9, letterSpacing: '-0.025em', margin: 0 }}>CAMPOS DO<br />JORDÃO</motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.4 }} style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.95rem', marginTop: '1.25rem', fontFamily: "'Inter', sans-serif" }}>Serra da Mantiqueira · São Paulo · 21–28 Ago 2026</motion.p>
+        <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1400px', margin: '0 auto', padding: '0 clamp(1.5rem, 5vw, 7rem)', display: 'flex', justifyContent: 'center' }}>
+          
+          {/* Container Flex para alinhar Logo Esquerda, Texto e Logo Direita */}
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 'clamp(1.5rem, 4vw, 3rem)', justifyContent: 'center', width: '100%' }}>
+            
+            {/* Logo da Usina do Jet animado */}
+            <motion.img 
+              initial={{ opacity: 0, scale: 0.9, x: -40 }} 
+              animate={{ opacity: 1, scale: 1, x: 0 }} 
+              transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              src="/images/logo usina 1000px x 1000px.png" 
+              alt="Usina do Jet" 
+              style={{ width: 'clamp(140px, 20vw, 220px)', height: 'auto', objectFit: 'contain', flexShrink: 0 }} 
+            />
+
+            {/* Bloco de Texto Atualizado - Efeito Sanduíche Laranja com Over-title Maior */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <motion.h2 
+                initial={{ opacity: 0, y: 15 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }} 
+                style={{ 
+                  fontFamily: "'Space Mono', monospace", 
+                  fontWeight: 700, 
+                  fontSize: 'clamp(1.1rem, 3.5vw, 1.8rem)', 
+                  letterSpacing: '0.15em', 
+                  textTransform: 'uppercase', 
+                  color: '#ff7b29', 
+                  margin: '0 0 0.5rem 0' 
+                }}
+              >
+                EXPEDIÇÃO - OFF ROAD
+              </motion.h2>
+              
+              <motion.h1 
+                initial={{ opacity: 0, y: 32 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }} 
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, fontSize: 'clamp(2.5rem, 7vw, 5.5rem)', color: '#fff', lineHeight: 0.9, letterSpacing: '-0.025em', margin: 0 }}
+              >
+                CAMPOS DO<br />JORDÃO
+              </motion.h1>
+              
+              <motion.p 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                transition={{ duration: 0.6, delay: 0.4 }} 
+                style={{ 
+                  color: '#ff7b29', 
+                  fontWeight: 600, 
+                  fontSize: '1.05rem', 
+                  marginTop: '1.25rem', 
+                  fontFamily: "'Inter', sans-serif", 
+                  textShadow: '0 2px 4px rgba(0,0,0,0.5)' 
+                }}
+              >
+                São Paulo · 21–28 Ago 2026
+              </motion.p>
+            </div>
+
+            {/* Logo do Alisson Guedes Jet animado (novo, à direita) */}
+            <motion.img 
+              initial={{ opacity: 0, scale: 0.9, x: 40 }} 
+              animate={{ opacity: 1, scale: 1, x: 0 }} 
+              transition={{ duration: 0.9, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              src="/images/logo alisson 1000px x 1000px.png" 
+              alt="Alisson Guedes Jet" 
+              style={{ width: 'clamp(170px, 26vw, 270px)', height: 'auto', objectFit: 'contain', flexShrink: 0 }} 
+            />
+
+          </div>
         </div>
       </section>
 
@@ -1188,7 +1255,9 @@ export default function ExpedicaoForm() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <BtnVoltar onClick={prevStep} />
-                  <motion.button type="button" onClick={nextStep} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '1rem 2.5rem', background: '#FF7B00', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase' as const, transition: 'background 0.2s' }} onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E06B00' }} onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#FF7B00' }}>Revisar <ArrowRight size={15} /></motion.button>
+                  <motion.button type="button" onClick={nextStep} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '1rem 2.5rem', background: '#FF7B00', color: '#fff', border: 'none', cursor: 'pointer', fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: '0.75rem', letterSpacing: '0.15em', textTransform: 'uppercase' as const, transition: 'background 0.2s' }} onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#E06B00' }} onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#FF7B00' }}>
+                    Próximo <ArrowRight size={15} />
+                  </motion.button>
                 </div>
               </motion.div>
             )}
