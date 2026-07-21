@@ -409,44 +409,6 @@ export default function ExpedicaoLanding() {
           </motion.div>
         </section>
 
-        {/* ── FOTOS DA EXPEDIÇÃO (grid 3x2, sem carrossel) ────── */}
-        <section className="section">
-          <div className="wrap" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
-            <motion.span initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="eyebrow" style={{ marginBottom: '1rem' }}>
-              A expedição em imagens
-            </motion.span>
-            <motion.h2
-              initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
-              className="display" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 3rem)', color: '#0A0A0A', marginBottom: '0.75rem', maxWidth: '640px' }}
-            >
-              Conheça mais sobre a expedição
-            </motion.h2>
-            <motion.p
-              initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
-              style={{ fontSize: '1rem', color: '#777', marginBottom: '2.5rem', maxWidth: '520px' }}
-            >
-              Hospedagem, trajeto e os momentos que fazem parte da expedição.
-            </motion.p>
-
-            <motion.div
-              initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={staggerContainer}
-              className="fotos-expedicao-grid"
-            >
-              {FOTOS_EXPEDICAO.map((foto, i) => (
-                <motion.button
-                  key={foto.src} variants={fadeUp}
-                  onClick={() => setFotosLightboxIndex(i)}
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.25 }}
-                  style={{ border: 'none', padding: 0, cursor: 'pointer', background: 'transparent', display: 'block', width: '100%' }}
-                >
-                  <ImagemComFallback src={foto.src} alt={foto.alt} aspectRatio="5 / 4" />
-                </motion.button>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
         {/* ── O QUE ESTÁ INCLUSO ──────────────────────────────── */}
         <section className="section">
           <div className="wrap" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
@@ -561,7 +523,7 @@ export default function ExpedicaoLanding() {
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
             className="display" style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', color: '#fff', marginBottom: '1.25rem' }}
           >
-            Bora pra serra?
+            Bora pra Campos?
           </motion.h2>
           <motion.p
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
