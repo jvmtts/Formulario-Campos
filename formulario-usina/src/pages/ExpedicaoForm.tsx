@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft, ArrowRight, Plus, Minus, Trash2, Check,
@@ -605,6 +605,11 @@ export default function ExpedicaoForm() {
   const topRef = useRef<HTMLDivElement>(null)
   const fieldRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
+  // SCROLL FIX: Joga a tela pro topo sempre que a página for aberta
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   const set = (field: keyof DadosFormulario, value: unknown) =>
     setData(p => ({ ...p, [field]: value }))
 
@@ -863,6 +868,22 @@ export default function ExpedicaoForm() {
           <img src="/images/CamposFormulario.png" alt="Campos do Jordão" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.35 }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0.15) 100%)' }} />
         </div>
+
+        <Link
+          to="/"
+          className="mono"
+          style={{
+            position: 'absolute', top: 'clamp(1.25rem, 3vh, 2rem)', left: 'clamp(1.25rem, 4vw, 2.5rem)', zIndex: 2,
+            display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.6)',
+            fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const, textDecoration: 'none',
+            transition: 'color 0.2s',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#fff' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)' }}
+        >
+          <ArrowLeft size={13} /> Voltar
+        </Link>
+
         <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1400px', margin: '0 auto', padding: '0 clamp(1.5rem, 5vw, 7rem)', display: 'flex', justifyContent: 'center' }}>
           
           {/* Container Flex para alinhar Logo Esquerda, Texto e Logo Direita */}
@@ -901,7 +922,7 @@ export default function ExpedicaoForm() {
                 initial={{ opacity: 0, y: 32 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }} 
-                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, fontSize: 'clamp(2.5rem, 7vw, 5.5rem)', color: '#fff', lineHeight: 0.9, letterSpacing: '-0.025em', margin: 0 }}
+                style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, fontSize: 'clamp(2.5rem, 7vw, 5.5rem)', color: '#fff', lineHeight: 1.1, letterSpacing: '-0.025em', margin: 0 }}
               >
                 CAMPOS DO<br />JORDÃO
               </motion.h1>
@@ -923,7 +944,7 @@ export default function ExpedicaoForm() {
               </motion.p>
             </div>
 
-            {/* Logo do Alisson Guedes Jet animado (novo, à direita) */}
+            {/* Logo do Alisson Guedes Jet animado */}
             <motion.img 
               initial={{ opacity: 0, scale: 0.9, x: 40 }} 
               animate={{ opacity: 1, scale: 1, x: 0 }} 
