@@ -152,17 +152,36 @@ button:hover .post-card-overlay { opacity: 1; }
   .fotos-expedicao-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Grid de fotos da expedição (3x2 fixo, 1 coluna no mobile) ── */
-.fotos-expedicao-grid {
-  grid-template-columns: repeat(3, 1fr);
-}
-@media (max-width: 780px) {
-  .fotos-expedicao-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* =========================================
+   AJUSTES MOBILE - EXPEDIÇÃO
+   ========================================= */
+@media (max-width: 768px) {
+  /* Adiciona respiro nas laterais e remove a margem do desktop */
+  .wrap-mobile-pad {
+    margin-left: 0 !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
   }
-}
-@media (max-width: 480px) {
-  .fotos-expedicao-grid {
-    grid-template-columns: 1fr;
+
+  /* Reseta apenas a margem (útil para o carrossel que já tem padding interno) */
+  .reset-margin-mobile {
+    margin-left: 0 !important;
+  }
+
+  /* O QUE ESTÁ INCLUSO: Empilha os cards em 1 coluna */
+  .grid-inclusos-mobile {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ROTEIRO DIA A DIA: Força a coluna e garante Imagem em cima, Texto embaixo */
+  .roteiro-card-mobile {
+    flex-direction: column !important;
+    gap: 2rem !important;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  .roteiro-card-mobile > div {
+    flex: 1 1 auto !important;
+    min-width: 100% !important;
   }
 }

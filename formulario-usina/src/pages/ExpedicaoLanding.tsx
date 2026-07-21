@@ -33,11 +33,7 @@ const INCLUSOS = [
   { icon: Users, titulo: 'Grupo fechado', desc: 'Turma limitada, pensada pra criar uma experiência coletiva de verdade.' },
 ]
 
-/* ── Roteiro dia a dia ────────────────────────────────────────────
-   `imagem` é só referência de placeholder — substitua o arquivo em
-   /public quando tiver a foto real de cada dia (fábrica de chocolate,
-   fazenda de morango, etc). Enquanto o arquivo não existir, o card
-   mostra um fallback tracejado com o nome do arquivo esperado. */
+/* ── Roteiro dia a dia ──────────────────────────────────────────── */
 const ROTEIRO = [
   {
     dia: 'Dia 1',
@@ -77,9 +73,7 @@ const ROTEIRO = [
   },
 ]
 
-/* ── Grid de fotos da expedição (3x2) ─────────────────────────────
-   Só imagens de referência/ambientação — sem carrossel, layout fixo.
-   Substitua cada arquivo em /public quando tiver a foto real. */
+/* ── Grid de fotos da expedição (3x2) ───────────────────────────── */
 const FOTOS_EXPEDICAO = [
   { src: '/images/imagensExpedicao/foto1.jpg', alt: 'Fachada do hotel em Campos do Jordão' },
   { src: '/images/imagensExpedicao/foto2.jpg', alt: 'Quadriciclos alinhados antes da trilha' },
@@ -100,7 +94,7 @@ const staggerContainer: Variants = {
   show: { transition: { staggerChildren: 0.09 } },
 }
 
-/* ── Imagem com fallback tracejado, reutilizada no card de dia e na galeria ── */
+/* ── Imagem com fallback ── */
 function ImagemComFallback({
   src, alt, aspectRatio = '4 / 5',
 }: { src: string; alt: string; aspectRatio?: string }) {
@@ -133,7 +127,7 @@ function ImagemComFallback({
   )
 }
 
-/* ── Card de imagem da galeria, com fallback caso a imagem não exista ainda ── */
+/* ── PostCard ── */
 function PostCard({ src, alt, onClick }: { src: string; alt: string; onClick: () => void }) {
   const [failed, setFailed] = useState(false)
 
@@ -188,13 +182,12 @@ function PostCard({ src, alt, onClick }: { src: string; alt: string; onClick: ()
   )
 }
 
-/* ── Card de cada dia do roteiro ──────────────────────────────────
-   Alterna imagem esquerda/direita pra criar ritmo visual ao longo
-   da timeline. No mobile empilha (imagem em cima, texto embaixo). */
+/* ── DiaCard ── */
 function DiaCard({ dia, invertido }: { dia: typeof ROTEIRO[number]; invertido: boolean }) {
   return (
     <motion.div
       initial="hidden" whileInView="show" viewport={{ once: true, margin: '-100px' }} variants={staggerContainer}
+      className="roteiro-card-mobile"
       style={{
         display: 'flex', flexDirection: invertido ? 'row-reverse' : 'row', flexWrap: 'wrap',
         alignItems: 'center', gap: 'clamp(2rem, 5vw, 4rem)', paddingTop: 'clamp(3rem, 6vh, 5rem)',
@@ -263,7 +256,7 @@ export default function ExpedicaoLanding() {
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.55) 40%, rgba(10,10,10,0.97) 100%)' }} />
         </div>
 
-        <div className="wrap" style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+        <div className="wrap" style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
           <motion.span
             initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
             className="mono" style={{ color: '#FF7B00', fontSize: 'clamp(1.35rem, 3.4vw, 1.9rem)', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' as const, marginBottom: '1.75rem' }}
@@ -311,9 +304,9 @@ export default function ExpedicaoLanding() {
 
       <TrailLine>
 
-        {/* ── SOBRE A EXPEDIÇÃO (intro compacta) ──────────────── */}
+        {/* ── SOBRE A EXPEDIÇÃO ──────────────── */}
         <section className="section" style={{ paddingBottom: 'clamp(2.5rem, 5vh, 4rem)' }}>
-          <div className="wrap" style={{ maxWidth: '880px', marginLeft: 'clamp(0px, 8vw, 120px)' }}>
+          <div className="wrap wrap-mobile-pad" style={{ maxWidth: '880px', marginLeft: 'clamp(0px, 8vw, 120px)' }}>
             <motion.span initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="eyebrow" style={{ marginBottom: '1rem' }}>
               A Expedição
             </motion.span>
@@ -354,7 +347,7 @@ export default function ExpedicaoLanding() {
 
         {/* ── ROTEIRO DIA A DIA ────────────────────────────────── */}
         <section className="section" style={{ paddingTop: 0 }}>
-          <div className="wrap" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
+          <div className="wrap wrap-mobile-pad" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
             <motion.span initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="eyebrow" style={{ marginBottom: '1rem' }}>
               O roteiro
             </motion.span>
@@ -377,7 +370,7 @@ export default function ExpedicaoLanding() {
 
         {/* ── GALERIA DO INSTAGRAM ────────────────────────────── */}
         <section className="section" style={{ background: '#F7F7F5' }}>
-          <div className="wrap" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
+          <div className="wrap wrap-mobile-pad" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
             <motion.span initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="eyebrow" style={{ marginBottom: '1rem' }}>
               No Instagram
             </motion.span>
@@ -397,7 +390,7 @@ export default function ExpedicaoLanding() {
 
           <motion.div
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={staggerContainer}
-            className="no-scrollbar"
+            className="no-scrollbar reset-margin-mobile"
             style={{
               display: 'flex', gap: '1.25rem', overflowX: 'auto', scrollSnapType: 'x mandatory',
               padding: '0 clamp(1.5rem, 5vw, 7rem) 0.5rem', marginLeft: 'clamp(0px, 8vw, 120px)',
@@ -411,7 +404,7 @@ export default function ExpedicaoLanding() {
 
         {/* ── O QUE ESTÁ INCLUSO ──────────────────────────────── */}
         <section className="section">
-          <div className="wrap" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
+          <div className="wrap wrap-mobile-pad" style={{ marginLeft: 'clamp(0px, 8vw, 120px)' }}>
             <motion.span initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="eyebrow" style={{ marginBottom: '1rem' }}>
               O que está incluso
             </motion.span>
@@ -424,6 +417,7 @@ export default function ExpedicaoLanding() {
 
             <motion.div
               initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={staggerContainer}
+              className="grid-inclusos-mobile"
               style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}
             >
               {INCLUSOS.map(item => {
@@ -456,7 +450,7 @@ export default function ExpedicaoLanding() {
             background: 'radial-gradient(circle, rgba(255,123,0,0.14) 0%, transparent 70%)', pointerEvents: 'none',
           }}
         />
-        <div className="wrap" style={{ position: 'relative', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(2.5rem, 6vw, 5rem)' }}>
+        <div className="wrap wrap-mobile-pad" style={{ position: 'relative', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(2.5rem, 6vw, 5rem)' }}>
           <div style={{ flex: '1 1 380px', minWidth: '280px' }}>
             <motion.span initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp} className="eyebrow" style={{ marginBottom: '1rem' }}>
               Locação de veículos
@@ -518,7 +512,7 @@ export default function ExpedicaoLanding() {
 
       {/* ── CTA FINAL ────────────────────────────────────────── */}
       <section style={{ background: '#0A0A0A', padding: 'clamp(5rem, 12vh, 9rem) 0' }}>
-        <div className="wrap" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="wrap wrap-mobile-pad" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <motion.h2
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
             className="display" style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', color: '#fff', marginBottom: '1.25rem' }}
@@ -541,7 +535,7 @@ export default function ExpedicaoLanding() {
 
       {/* ── FOOTER ───────────────────────────────────────────── */}
       <footer style={{ background: '#0A0A0A', borderTop: '1px solid rgba(255,255,255,0.08)', padding: '2rem 0' }}>
-        <div className="wrap" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+        <div className="wrap wrap-mobile-pad" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
           <img src="/images/logo usina 1000px x 1000px.png" alt="Usina do Jet" style={{ height: '2.25rem', width: 'auto', objectFit: 'contain' }} />
           <p className="mono" style={{ fontSize: '0.62rem', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)' }}>
             © 2026 Usina do Jet. Todos os direitos reservados.
