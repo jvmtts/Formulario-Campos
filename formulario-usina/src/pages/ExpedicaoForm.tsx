@@ -10,6 +10,8 @@ import {
 interface Acompanhante {
   nome: string
   rg: string
+  idade: string
+  tamanhoCamiseta: string
   sexo: string
   whatsapp: string
   email: string
@@ -25,6 +27,7 @@ interface DadosFormulario {
   estadoCivil: string
   rg: string
   orgaoEmissor: string
+  tamanhoCamiseta: string
   endereco: string
   numero: string
   complemento: string
@@ -51,13 +54,13 @@ interface DadosFormulario {
 type Errors = Record<string, string>
 
 const acompanhanteVazio = (): Acompanhante => ({
-  nome: '', rg: '', sexo: '', whatsapp: '', email: '',
+  nome: '', rg: '', idade: '', tamanhoCamiseta: '', sexo: '', whatsapp: '', email: '',
 })
 
 const initialData: DadosFormulario = {
   tipoInscricao: '',
   nome: '', email: '', whatsapp: '', nacionalidade: 'Brasil',
-  cpf: '', estadoCivil: '', rg: '', orgaoEmissor: '',
+  cpf: '', estadoCivil: '', rg: '', orgaoEmissor: '', tamanhoCamiseta: '',
   endereco: '', numero: '', complemento: '', bairro: '', estado: '', cep: '',
   acompanhante: acompanhanteVazio(),
   acompanhantesAdicionais: [],
@@ -68,6 +71,9 @@ const initialData: DadosFormulario = {
   tipoLocacao: '', qtdQuadriciclos: 0, qtdUtvs: 0, observacaoLocacao: '',
   confirmacao: false,
 }
+
+/* ── Tamanhos de camiseta disponíveis ──────────────────────────── */
+const TAMANHOS_CAMISETA = ['Infantil', 'P', 'M', 'G', 'GG', 'XG']
 
 /* ── Lista de Países (Nacionalidade) com códigos ISO para as bandeiras */
 const paises = [
@@ -86,6 +92,38 @@ const paises = [
   { nome: 'Canadá', code: 'ca' },
   { nome: 'Japão', code: 'jp' },
   { nome: 'Outro', code: 'un' } // 'un' será tratado para exibir um globo
+]
+
+/* ── Lista de Estados brasileiros (UF + nome completo + região, pra
+     colorir o "selo" de cada estado e dar uma pista visual a mais) ── */
+const estados = [
+  { uf: 'AC', nome: 'Acre', regiao: 'norte' },
+  { uf: 'AL', nome: 'Alagoas', regiao: 'nordeste' },
+  { uf: 'AP', nome: 'Amapá', regiao: 'norte' },
+  { uf: 'AM', nome: 'Amazonas', regiao: 'norte' },
+  { uf: 'BA', nome: 'Bahia', regiao: 'nordeste' },
+  { uf: 'CE', nome: 'Ceará', regiao: 'nordeste' },
+  { uf: 'DF', nome: 'Distrito Federal', regiao: 'centro-oeste' },
+  { uf: 'ES', nome: 'Espírito Santo', regiao: 'sudeste' },
+  { uf: 'GO', nome: 'Goiás', regiao: 'centro-oeste' },
+  { uf: 'MA', nome: 'Maranhão', regiao: 'nordeste' },
+  { uf: 'MT', nome: 'Mato Grosso', regiao: 'centro-oeste' },
+  { uf: 'MS', nome: 'Mato Grosso do Sul', regiao: 'centro-oeste' },
+  { uf: 'MG', nome: 'Minas Gerais', regiao: 'sudeste' },
+  { uf: 'PA', nome: 'Pará', regiao: 'norte' },
+  { uf: 'PB', nome: 'Paraíba', regiao: 'nordeste' },
+  { uf: 'PR', nome: 'Paraná', regiao: 'sul' },
+  { uf: 'PE', nome: 'Pernambuco', regiao: 'nordeste' },
+  { uf: 'PI', nome: 'Piauí', regiao: 'nordeste' },
+  { uf: 'RJ', nome: 'Rio de Janeiro', regiao: 'sudeste' },
+  { uf: 'RN', nome: 'Rio Grande do Norte', regiao: 'nordeste' },
+  { uf: 'RS', nome: 'Rio Grande do Sul', regiao: 'sul' },
+  { uf: 'RO', nome: 'Rondônia', regiao: 'norte' },
+  { uf: 'RR', nome: 'Roraima', regiao: 'norte' },
+  { uf: 'SC', nome: 'Santa Catarina', regiao: 'sul' },
+  { uf: 'SP', nome: 'São Paulo', regiao: 'sudeste' },
+  { uf: 'SE', nome: 'Sergipe', regiao: 'nordeste' },
+  { uf: 'TO', nome: 'Tocantins', regiao: 'norte' },
 ]
 
 /* ── Validações ──────────────────────────────────────────────────── */
@@ -196,7 +234,7 @@ function Field({ label, required = false, error, fieldRef, children }: {
 
 function Input({ value, onChange, placeholder = '', type = 'text', mask, icon, error, shakeNonce }: {
   value: string; onChange: (v: string) => void; placeholder?: string; type?: string;
-  mask?: 'whatsapp' | 'cpf' | 'rg' | 'cep' | 'nome' | 'ano' | 'cnh'; icon?: React.ReactNode;
+  mask?: 'whatsapp' | 'cpf' | 'rg' | 'cep' | 'nome' | 'ano' | 'cnh' | 'idade'; icon?: React.ReactNode;
   error?: boolean; shakeNonce?: number
 }) {
   const [focused, setFocused] = useState(false)
@@ -241,6 +279,10 @@ function Input({ value, onChange, placeholder = '', type = 'text', mask, icon, e
     }
     if (mask === 'cnh') {
       onChange(rawValue.replace(/\D/g, '').slice(0, 11))
+      return
+    }
+    if (mask === 'idade') {
+      onChange(rawValue.replace(/\D/g, '').slice(0, 3))
       return
     }
     onChange(rawValue)
@@ -446,6 +488,143 @@ function CountrySelect({ value, onChange, error, shakeNonce }: { value: string, 
   )
 }
 
+/* ── Selo colorido por região, usado no lugar da "bandeira" pro estado.
+     Evita depender de imagens externas de bandeiras estaduais (que não têm
+     uma fonte confiável e padronizada como as de país) mantendo, ainda
+     assim, uma pista visual rápida por região do Brasil. ── */
+const CORES_REGIAO: Record<string, string> = {
+  norte: '#2F9E44',
+  nordeste: '#E8590C',
+  'centro-oeste': '#C9A227',
+  sudeste: '#FF7B00',
+  sul: '#1971C2',
+}
+
+function SeloEstado({ uf, regiao, size = 34 }: { uf: string; regiao: string; size?: number }) {
+  return (
+    <span
+      style={{
+        width: size, height: size, flexShrink: 0, borderRadius: '6px',
+        background: CORES_REGIAO[regiao] ?? '#777',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: size * 0.34,
+        color: '#fff', letterSpacing: '0.02em',
+      }}
+    >
+      {uf}
+    </span>
+  )
+}
+
+/* ── Seletor de Estado (UF) com busca — mesmo padrão do CountrySelect,
+     mas com um selo colorido por região no lugar da bandeira. Busca
+     tanto pela sigla (ex: "sp") quanto pelo nome (ex: "são paulo"). ── */
+function StateSelect({ value, onChange, error, shakeNonce }: { value: string; onChange: (v: string) => void; error?: boolean; shakeNonce?: number }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false)
+        setSearch('')
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const termo = search.trim().toLowerCase()
+  const filtered = estados.filter(s => s.nome.toLowerCase().includes(termo) || s.uf.toLowerCase().includes(termo))
+  const current = estados.find(s => s.uf === value)
+  const borderColor = error ? '#ef4444' : isOpen ? '#FF7B00' : '#DEDEDE'
+  const boxShadow = error ? '0 0 0 3px rgba(239,68,68,0.08)' : isOpen ? '0 0 0 3px rgba(255,123,0,0.08)' : 'none'
+
+  return (
+    <ShakeWrap error={error} shakeNonce={shakeNonce}>
+      <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
+        <div
+          onClick={() => setIsOpen(o => { const next = !o; if (o) setSearch(''); return next })}
+          style={{
+            ...inputStyle, cursor: 'pointer',
+            borderColor, boxShadow,
+            display: 'flex', alignItems: 'center', gap: '0.75rem',
+          }}
+        >
+          {current ? (
+            <SeloEstado uf={current.uf} regiao={current.regiao} size={26} />
+          ) : (
+            <span style={{
+              width: 26, height: 26, flexShrink: 0, borderRadius: '6px', border: '1.5px dashed #DEDEDE',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#BBB', fontSize: '0.9rem',
+            }}>
+              —
+            </span>
+          )}
+          <span style={{ flex: 1, color: value ? '#0A0A0A' : '#999' }}>
+            {current ? `${current.nome} (${current.uf})` : 'Selecione o estado...'}
+          </span>
+          <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }} style={{ display: 'flex', alignItems: 'center' }}>
+            <ChevronDown size={14} style={{ color: '#999', pointerEvents: 'none' }} />
+          </motion.div>
+        </div>
+
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+              style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100,
+                background: '#fff', border: '1.5px solid #FF7B00', borderTop: 'none',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column'
+              }}
+            >
+              <div style={{ padding: '0.5rem', borderBottom: '1px solid #EBEBEB' }}>
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Buscar estado ou sigla (ex: SP)..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  style={{
+                    width: '100%', padding: '0.6rem 0.75rem',
+                    border: '1px solid #DEDEDE', background: '#FAFAFA',
+                    outline: 'none', fontSize: '0.85rem', fontFamily: "'Inter', sans-serif"
+                  }}
+                />
+              </div>
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', maxHeight: '220px', overflowY: 'auto' }}>
+                {filtered.length > 0 ? filtered.map(s => (
+                  <li
+                    key={s.uf}
+                    onClick={() => { onChange(s.uf); setIsOpen(false); setSearch('') }}
+                    style={{
+                      padding: '0.6rem 1rem', fontSize: '0.85rem', fontFamily: "'Inter', sans-serif",
+                      color: '#0A0A0A', cursor: 'pointer', transition: 'background 0.15s, color 0.15s',
+                      display: 'flex', alignItems: 'center', gap: '0.75rem'
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,123,0,0.06)'; e.currentTarget.style.color = '#FF7B00' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#0A0A0A' }}
+                  >
+                    <SeloEstado uf={s.uf} regiao={s.regiao} size={26} />
+                    {s.nome}
+                  </li>
+                )) : (
+                  <li style={{ padding: '0.85rem 1rem', color: '#999', fontSize: '0.85rem', fontFamily: "'Inter', sans-serif" }}>
+                    Nenhum estado encontrado
+                  </li>
+                )}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </ShakeWrap>
+  )
+}
+
 function FileInput({ label, required = false, value, onChange, error }: {
   label: string; required?: boolean; value: File | null; onChange: (f: File | null) => void; error?: boolean
 }) {
@@ -502,8 +681,8 @@ function QuantityStepper({ label, value, onChange, min = 0, max = 10 }: {
 }
 
 /* ── Bloco de acompanhante ───────────────────────────────────────── */
-function BlocoAcompanhante({ titulo, data, onChange, onRemove }: {
-  titulo: string; data: Acompanhante; onChange: (field: keyof Acompanhante, value: string) => void; onRemove?: () => void
+function BlocoAcompanhante({ titulo, data, onChange, onRemove, rgObrigatorio = false }: {
+  titulo: string; data: Acompanhante; onChange: (field: keyof Acompanhante, value: string) => void; onRemove?: () => void; rgObrigatorio?: boolean
 }) {
   return (
     <motion.div
@@ -526,8 +705,10 @@ function BlocoAcompanhante({ titulo, data, onChange, onRemove }: {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
         <Field label="Nome Completo" required><Input value={data.nome} onChange={v => onChange('nome', v)} placeholder="Nome completo" mask="nome" /></Field>
-        <Field label="RG"><Input value={data.rg} onChange={v => onChange('rg', v)} placeholder="00.000.000-0" mask="rg" /></Field>
+        <Field label="RG" required={rgObrigatorio}><Input value={data.rg} onChange={v => onChange('rg', v)} placeholder="00.000.000-0" mask="rg" /></Field>
+        <Field label="Idade" required><Input value={data.idade} onChange={v => onChange('idade', v)} placeholder="Ex: 32" mask="idade" /></Field>
         <Field label="Sexo"><Select value={data.sexo} onChange={v => onChange('sexo', v)} options={['Masculino', 'Feminino', 'Prefiro não informar']} /></Field>
+        <Field label="Tamanho da Camiseta" required><Select value={data.tamanhoCamiseta} onChange={v => onChange('tamanhoCamiseta', v)} options={TAMANHOS_CAMISETA} /></Field>
         <Field label="WhatsApp"><Input value={data.whatsapp} onChange={v => onChange('whatsapp', v)} placeholder="(11) 99999-9999" mask="whatsapp" /></Field>
         <Field label="Email" required><Input value={data.email} onChange={v => onChange('email', v)} type="email" placeholder="email@exemplo.com" /></Field>
       </div>
@@ -667,6 +848,8 @@ export default function ExpedicaoForm() {
 
     if (!data.orgaoEmissor.trim()) e.orgaoEmissor = 'Informe o órgão emissor.'
 
+    if (!data.tamanhoCamiseta) e.tamanhoCamiseta = 'Selecione o tamanho da camiseta.'
+
     if (!data.endereco.trim()) e.endereco = 'Informe o endereço.'
     if (!data.numero.trim()) e.numero = 'Informe o número.'
     if (!data.bairro.trim()) e.bairro = 'Informe o bairro.'
@@ -677,14 +860,30 @@ export default function ExpedicaoForm() {
     if (data.comoChegou === 'Outro' && !data.comoChegouOutro.trim()) e.comoChegouOutro = 'Especifique como chegou até nós.'
 
     if (data.tipoInscricao === 'dupla') {
-      if (!data.acompanhante.nome.trim() || !data.acompanhante.email.trim()) {
+      const p = data.acompanhante
+      if (!p.nome.trim() || !p.email.trim()) {
         e.acompanhante = 'Preencha nome e email do acompanhante principal.'
-      } else if (!isValidEmail(data.acompanhante.email)) {
+      } else if (!isValidEmail(p.email)) {
         e.acompanhante = 'Email do acompanhante principal inválido.'
+      } else if (p.rg.replace(/[^a-zA-Z0-9]/g, '').length < 7) {
+        e.acompanhante = 'Informe o RG do acompanhante principal.'
+      } else if (!p.idade.trim()) {
+        e.acompanhante = 'Informe a idade do acompanhante principal.'
+      } else if (!p.tamanhoCamiseta) {
+        e.acompanhante = 'Selecione o tamanho da camiseta do acompanhante principal.'
       }
+
       for (const ac of data.acompanhantesAdicionais) {
         if (!ac.nome.trim() || !ac.email.trim() || !isValidEmail(ac.email)) {
           e.acompanhante = 'Verifique nome e email de todos os acompanhantes adicionados.'
+          break
+        }
+        if (!ac.idade.trim()) {
+          e.acompanhante = 'Informe a idade de todos os acompanhantes adicionados.'
+          break
+        }
+        if (!ac.tamanhoCamiseta) {
+          e.acompanhante = 'Selecione o tamanho da camiseta de todos os acompanhantes adicionados.'
           break
         }
       }
@@ -728,7 +927,7 @@ export default function ExpedicaoForm() {
         setErrors(errs)
         setShakeNonce(n => n + 1)
         setErroValidacao('Alguns campos precisam da sua atenção antes de continuar.')
-        scrollToFirstError(errs, ['tipoInscricao', 'nome', 'email', 'whatsapp', 'nacionalidade', 'cpf', 'estadoCivil', 'rg', 'orgaoEmissor', 'acompanhante', 'endereco', 'numero', 'bairro', 'cep', 'estado', 'comoChegou', 'comoChegouOutro'])
+        scrollToFirstError(errs, ['tipoInscricao', 'nome', 'email', 'whatsapp', 'nacionalidade', 'cpf', 'estadoCivil', 'rg', 'orgaoEmissor', 'tamanhoCamiseta', 'acompanhante', 'endereco', 'numero', 'bairro', 'cep', 'estado', 'comoChegou', 'comoChegouOutro'])
         return
       }
     }
@@ -764,6 +963,7 @@ export default function ExpedicaoForm() {
     formData.append('Estado Civil', data.estadoCivil)
     formData.append('RG', data.rg)
     formData.append('Órgão Emissor', data.orgaoEmissor)
+    formData.append('Tamanho Camiseta', data.tamanhoCamiseta)
 
     formData.append('Endereço', `${data.endereco}, ${data.numero}${data.complemento ? ' - ' + data.complemento : ''}, ${data.bairro}, ${data.estado} - CEP ${data.cep}`)
 
@@ -772,6 +972,8 @@ export default function ExpedicaoForm() {
     if (data.tipoInscricao === 'dupla') {
       formData.append('Acompanhante Principal - Nome', data.acompanhante.nome)
       formData.append('Acompanhante Principal - RG', data.acompanhante.rg)
+      formData.append('Acompanhante Principal - Idade', data.acompanhante.idade)
+      formData.append('Acompanhante Principal - Tamanho Camiseta', data.acompanhante.tamanhoCamiseta)
       formData.append('Acompanhante Principal - Sexo', data.acompanhante.sexo)
       formData.append('Acompanhante Principal - WhatsApp', data.acompanhante.whatsapp)
       formData.append('Acompanhante Principal - Email', data.acompanhante.email)
@@ -779,6 +981,8 @@ export default function ExpedicaoForm() {
       data.acompanhantesAdicionais.forEach((ac, i) => {
         formData.append(`Acompanhante Adicional ${i + 1} - Nome`, ac.nome)
         formData.append(`Acompanhante Adicional ${i + 1} - RG`, ac.rg)
+        formData.append(`Acompanhante Adicional ${i + 1} - Idade`, ac.idade)
+        formData.append(`Acompanhante Adicional ${i + 1} - Tamanho Camiseta`, ac.tamanhoCamiseta)
         formData.append(`Acompanhante Adicional ${i + 1} - Sexo`, ac.sexo)
         formData.append(`Acompanhante Adicional ${i + 1} - WhatsApp`, ac.whatsapp)
         formData.append(`Acompanhante Adicional ${i + 1} - Email`, ac.email)
@@ -1027,6 +1231,9 @@ export default function ExpedicaoForm() {
                     <Field label="Órgão Emissor" required error={errors.orgaoEmissor} fieldRef={el => { fieldRefs.current['orgaoEmissor'] = el }}>
                       <Input value={data.orgaoEmissor} onChange={v => set('orgaoEmissor', v)} placeholder="Ex: SSP/SP" error={!!errors.orgaoEmissor} shakeNonce={shakeNonce} />
                     </Field>
+                    <Field label="Tamanho da Camiseta" required error={errors.tamanhoCamiseta} fieldRef={el => { fieldRefs.current['tamanhoCamiseta'] = el }}>
+                      <Select value={data.tamanhoCamiseta} onChange={v => set('tamanhoCamiseta', v)} options={TAMANHOS_CAMISETA} error={!!errors.tamanhoCamiseta} shakeNonce={shakeNonce} />
+                    </Field>
                   </div>
                 </div>
 
@@ -1051,7 +1258,7 @@ export default function ExpedicaoForm() {
                     </Field>
                     <div style={{ gridColumn: '1 / -1' }}>
                       <Field label="Estado" required error={errors.estado} fieldRef={el => { fieldRefs.current['estado'] = el }}>
-                        <Select value={data.estado} onChange={v => set('estado', v)} options={['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']} error={!!errors.estado} shakeNonce={shakeNonce} />
+                        <StateSelect value={data.estado} onChange={v => set('estado', v)} error={!!errors.estado} shakeNonce={shakeNonce} />
                       </Field>
                     </div>
                   </div>
@@ -1062,8 +1269,8 @@ export default function ExpedicaoForm() {
                   {data.tipoInscricao === 'dupla' && (
                     <motion.div key="acomp-principal" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }} style={{ overflow: 'visible', marginBottom: '1rem' }} ref={el => { fieldRefs.current['acompanhante'] = el }}>
                       <p style={{ ...labelStyle, color: '#FF7B00', marginBottom: '0.35rem', fontSize: '0.65rem' }}>— Acompanhante</p>
-                      <p style={{ fontSize: '0.78rem', color: '#999', fontFamily: "'Inter', sans-serif", marginBottom: '1rem' }}>Você pode adicionar até {LIMITE_ACOMPANHANTES_ADICIONAIS} acompanhantes adicionais, além do principal.</p>
-                      <BlocoAcompanhante titulo="Acompanhante Principal" data={data.acompanhante} onChange={setAcomp} />
+                      <p style={{ fontSize: '0.78rem', color: '#999', fontFamily: "'Inter', sans-serif", marginBottom: '1rem' }}>Você pode adicionar até {LIMITE_ACOMPANHANTES_ADICIONAIS} acompanhantes adicionais, além do principal. O RG do acompanhante principal é obrigatório; para os adicionais, é opcional (ex: filhos que ainda não possuem documento).</p>
+                      <BlocoAcompanhante titulo="Acompanhante Principal" data={data.acompanhante} onChange={setAcomp} rgObrigatorio />
                       <AnimatePresence>
                         {errors.acompanhante && (
                           <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={errorTextStyle}>
@@ -1300,6 +1507,7 @@ export default function ExpedicaoForm() {
                     <RevisaoLinha label="CPF" value={data.cpf} />
                     <RevisaoLinha label="RG" value={data.rg} />
                     <RevisaoLinha label="Estado Civil" value={data.estadoCivil} />
+                    <RevisaoLinha label="Tamanho da Camiseta" value={data.tamanhoCamiseta} />
                     <RevisaoLinha label="Endereço" value={[data.endereco, data.numero, data.complemento, data.bairro, data.estado, data.cep].filter(Boolean).join(', ')} />
                     {data.tipoInscricao === 'dupla' && <RevisaoLinha label="Acompanhantes" value={`${totalAcomp} pessoa${totalAcomp !== 1 ? 's' : ''}`} />}
                     <RevisaoLinha label="Como nos encontrou" value={data.comoChegou === 'Outro' ? `Outro: ${data.comoChegouOutro}` : data.comoChegou} />
