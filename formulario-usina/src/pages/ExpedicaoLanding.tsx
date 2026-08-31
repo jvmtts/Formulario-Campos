@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, type Variants } from 'framer-motion'
 import {
-  ChevronDown, Tent, Wrench, MapPinned, UtensilsCrossed, ShieldCheck, Users, ImageOff, ArrowRight, Check, Phone,
+  Tent, Wrench, MapPinned, UtensilsCrossed, ShieldCheck, Users, ImageOff, ArrowRight, Check, Phone,
 } from 'lucide-react'
 import TopBar from '../components/TopBar'
 import TrailLine from '../components/TrailLine'
@@ -14,14 +14,14 @@ import Lightbox from '../components/Lightbox'
 const HERO_IMAGE = '/images/CamposFormulario.png'
 
 const GALERIA_INSTAGRAM = [
-  { src: '/images/Carrosel/imagem1.jpeg', alt: 'Roteiro da expedição — dia 1' },
-  { src: '/images/Carrosel/imagem2.jpeg', alt: 'Roteiro da expedição — dia 2' },
-  { src: '/images/Carrosel/imagem3.jpeg', alt: 'Estrutura de apoio' },
-  { src: '/images/Carrosel/imagem4.jpeg', alt: 'Hospedagem' },
-  { src: '/images/Carrosel/imagem5.jpeg', alt: 'Trilhas e paisagens' },
-  { src: '/images/Carrosel/imagem6.jpeg', alt: 'O que levar' },
-  { src: '/images/Carrosel/imagem7.jpeg', alt: 'Regras de segurança' },
-  { src: '/images/Carrosel/imagem8.jpeg', alt: 'Edição anterior' },
+  { src: '/images/Carrosel/imagem1.jpeg', alt: 'Registro da edição anterior — roteiro do primeiro dia' },
+  { src: '/images/Carrosel/imagem2.jpeg', alt: 'Registro da edição anterior — roteiro do segundo dia' },
+  { src: '/images/Carrosel/imagem3.jpeg', alt: 'Registro da estrutura de apoio da edição anterior' },
+  { src: '/images/Carrosel/imagem4.jpeg', alt: 'Registro da hospedagem da edição anterior' },
+  { src: '/images/Carrosel/imagem5.jpeg', alt: 'Registro de trilhas e paisagens da edição anterior' },
+  { src: '/images/Carrosel/imagem6.jpeg', alt: 'Orientações da edição anterior' },
+  { src: '/images/Carrosel/imagem7.jpeg', alt: 'Regras de segurança da edição anterior' },
+  { src: '/images/Carrosel/imagem8.jpeg', alt: 'Registro de uma edição anterior da expedição' },
 ]
 
 const INCLUSOS = [
@@ -37,50 +37,62 @@ const INCLUSOS = [
 const ROTEIRO = [
   {
     dia: 'Dia 1',
-    data: 'Sexta-feira',
-    titulo: 'Chegada e abertura',
+    data: 'Sexta-feira · 30/10',
+    titulo: 'Chegada, abertura e pôr do sol',
     imagem: '/images/imagensRoteiro/imagem3.png',
     atividades: [
-      'Check-in no evento e no hotel em Campos do Jordão',
-      'Jantar de abertura e reunião com participantes',
-      'Resenha no centro de Campos do Jordão',
-      'Chocolate quente',
+      'Chegada dos participantes por volta das 14h',
+      'Café de boas-vindas e abertura do evento às 17h',
+      'Saída no fim da tarde para a trilha',
+      'Pôr do sol no Pico do Imbiri',
+      'Jantar no Fattoria',
     ],
   },
   {
     dia: 'Dia 2',
-    data: 'Sábado',
-    titulo: 'Roteiro off-road',
+    data: 'Sábado · 31/10',
+    titulo: 'Primeiro dia de cachoeiras',
     imagem: '/images/imagensRoteiro/imagem2.png',
     atividades: [
-      'Café da manhã',
-      'Cachoeiras, trilhas e estradas de terra',
-      'Percurso guiado até Minas Gerais',
-      'Visita à fazenda de morangos e colheita de morango',
-      'Almoço na fazenda',
-      'Jantar especial no centro de Campos do Jordão',
+      'Saída cedo para o roteiro de cachoeiras',
+      'Percurso off-road pelo Caminho das Cachoeiras',
+      'Almoço incluído',
+      'Jantar incluído',
     ],
   },
   {
     dia: 'Dia 3',
-    data: 'Domingo',
-    titulo: 'Pico do Itapeva e fábrica de chocolate',
+    data: 'Domingo · 01/11',
+    titulo: 'Segundo dia de cachoeiras',
     imagem: '/images/imagensRoteiro/imagem1.png',
     atividades: [
-      'Café da manhã no Pico do Itapeva — ponto mais alto da região (2.030m)',
-      'Almoço na fábrica de chocolate',
+      'Saída cedo para o segundo dia do roteiro de cachoeiras',
+      'Continuação do percurso off-road',
+      'Almoço incluído',
+      'Jantar incluído',
+      'Hospedagem de domingo para segunda-feira incluída',
+    ],
+  },
+  {
+    dia: 'Dia livre',
+    data: 'Segunda-feira · 02/11',
+    titulo: 'Campos do Jordão ou retorno',
+    imagem: '/images/imagensRoteiro/imagem3.png',
+    atividades: [
+      'Dia livre para aproveitar Campos do Jordão',
+      'Retorno para casa no horário que cada participante preferir',
     ],
   },
 ]
 
 /* ── Grid de fotos da expedição (3x2) ───────────────────────────── */
 const FOTOS_EXPEDICAO = [
-  { src: '/images/imagensExpedicao/foto1.jpg', alt: 'Fachada do hotel em Campos do Jordão' },
-  { src: '/images/imagensExpedicao/foto2.jpg', alt: 'Quadriciclos alinhados antes da trilha' },
-  { src: '/images/imagensExpedicao/foto3.jpg', alt: 'Grupo no trajeto off-road' },
-  { src: '/images/imagensExpedicao/foto4.jpg', alt: 'Fábrica de chocolate' },
-  { src: '/images/imagensExpedicao/foto5.jpg', alt: 'Trilha entre a neblina da serra' },
-  { src: '/images/imagensExpedicao/foto6.jpg', alt: 'Comboio de quadriciclos em movimento' },
+  { src: '/images/imagensExpedicao/foto1.jpg', alt: 'Registro da hospedagem de uma edição anterior' },
+  { src: '/images/imagensExpedicao/foto2.jpg', alt: 'Quadriciclos reunidos em uma edição anterior' },
+  { src: '/images/imagensExpedicao/foto3.jpg', alt: 'Grupo em trajeto off-road de uma edição anterior' },
+  { src: '/images/imagensExpedicao/foto4.jpg', alt: 'Parada durante uma edição anterior' },
+  { src: '/images/imagensExpedicao/foto5.jpg', alt: 'Trilha na Serra da Mantiqueira' },
+  { src: '/images/imagensExpedicao/foto6.jpg', alt: 'Comboio off-road de uma edição anterior' },
 ]
 
 /* ── Variantes de animação reutilizáveis ─────────────────────────── */
@@ -244,62 +256,23 @@ export default function ExpedicaoLanding() {
     <div style={{ background: '#fff' }}>
       <TopBar />
 
-      {/* ── HERO ─────────────────────────────────────────────── */}
-      <section
-        style={{
-          position: 'relative', minHeight: '100svh', display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#0A0A0A',
-        }}
-      >
-        <div style={{ position: 'absolute', inset: 0 }}>
-          <img src={HERO_IMAGE} alt="Campos do Jordão" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.45 }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.55) 40%, rgba(10,10,10,0.97) 100%)' }} />
+      {/* ── HERO: a arte é a protagonista, sem textos duplicados ── */}
+      <section className="landing-poster-hero" aria-labelledby="landing-event-title">
+        <h1 id="landing-event-title" className="sr-only">Expedição Caminho das Cachoeiras</h1>
+        <img className="landing-poster-hero__image" src={HERO_IMAGE} alt="Expedição Caminho das Cachoeiras, de 30 de outubro a 1 de novembro" />
+        <div className="landing-poster-hero__shade" aria-hidden />
+      </section>
+
+      <section className="landing-hero-action" aria-label="Informações principais da expedição">
+        <div className="wrap landing-hero-action__inner">
+          <div>
+            <span className="mono landing-hero-action__date">30 OUT · 01 NOV 2026</span>
+            <p className="landing-hero-action__place">Campos do Jordão + Santo Antônio do Pinhal · Saída de São Paulo</p>
+          </div>
+          <Link to="/inscricao" className="btn-primary landing-hero-action__button">
+            Quero minha vaga <ArrowRight size={16} />
+          </Link>
         </div>
-
-        <div className="wrap" style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
-          <motion.span
-            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-            className="mono" style={{ color: '#FF7B00', fontSize: 'clamp(1.35rem, 3.4vw, 1.9rem)', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' as const, marginBottom: '1.75rem' }}
-          >
-            Expedição Off-Road · 2026
-          </motion.span>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 32 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.85, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="display" style={{ color: '#fff', fontSize: 'clamp(3rem, 10vw, 8rem)', marginBottom: '1.5rem', lineHeight: 1.1 }}
-          >
-            CAMPOS DO<br />JORDÃO
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.35 }}
-            style={{ color: 'rgba(255,255,255,0.75)', fontSize: 'clamp(0.95rem, 1.6vw, 1.15rem)', maxWidth: '540px', lineHeight: 1.7, marginBottom: '2.5rem' }}
-          >
-            Oito dias de UTV e quadriciclo entre serra, neblina e trilha técnica.
-            Uma expedição fechada, com apoio total, pra quem quer sentir a estrada de verdade.
-          </motion.p>
-
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }}>
-            <Link to="/inscricao" className="btn-primary" style={{ padding: '1.15rem 2.75rem', fontSize: '0.78rem' }}>
-              Quero minha vaga <ArrowRight size={16} />
-            </Link>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.65 }}
-            className="mono" style={{ color: 'rgba(255,255,255,0.65)', fontSize: 'clamp(0.8rem, 1.6vw, 0.95rem)', fontWeight: 700, letterSpacing: '0.14em', marginTop: '1.5rem' }}
-          >
-            21–23 de Agosto · Saída de São Paulo
-          </motion.p>
-        </div>
-
-        <motion.div
-          animate={{ y: [0, 8, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ position: 'absolute', bottom: 'clamp(1.5rem, 4vh, 3rem)', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.6)' }}
-        >
-          <span className="mono" style={{ fontSize: 'clamp(0.7rem, 1.3vw, 0.8rem)', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase' as const }}>Role para conhecer</span>
-          <ChevronDown size={20} />
-        </motion.div>
       </section>
 
       <TrailLine>
@@ -315,26 +288,28 @@ export default function ExpedicaoLanding() {
               initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
               className="display" style={{ fontSize: 'clamp(1.7rem, 4vw, 2.6rem)', color: '#0A0A0A', marginBottom: '1.5rem' }}
             >
-              Motor ligado, serra à frente.
+              Cachoeiras à frente. Máquina pronta.
             </motion.h2>
 
             <motion.p
               initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
               style={{ fontSize: 'clamp(0.95rem, 1.4vw, 1.05rem)', color: '#555', lineHeight: 1.8, marginBottom: '2.5rem', maxWidth: '640px' }}
             >
-              De 21 a 23 de agosto, a Usina do Jet leva um grupo fechado de pilotos pelas trilhas de
-              Campos do Jordão. Apoio total da equipe, hospedagem resolvida, e um roteiro desenhado
-              pra testar sua máquina sem testar sua paciência. Veja abaixo como fica cada dia.
+              De 30 de outubro a 1º de novembro de 2026, a Expedição Off-Road Usina do Jet percorre
+              o Caminho das Cachoeiras entre Campos do Jordão e Santo Antônio do Pinhal. A experiência
+              termina com hospedagem incluída e uma segunda-feira livre para curtir a serra ou voltar para casa.
             </motion.p>
 
             <motion.div
               initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={staggerContainer}
-              style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '2rem', borderTop: '1px solid #EBEBEB', paddingTop: '2rem' }}
+              className="event-date-grid"
+              style={{ borderTop: '1px solid #EBEBEB', paddingTop: '2rem' }}
             >
               {[
-                { n: '3', l: 'Dias de expedição' },
-                { n: '21–23', l: 'Agosto de 2026' },
-                { n: 'Limitadas', l: 'Vagas disponíveis' },
+                { n: '30 OUT', l: 'Chegada e abertura' },
+                { n: '31 OUT', l: 'Cachoeiras · Dia 1' },
+                { n: '01 NOV', l: 'Cachoeiras · Dia 2' },
+                { n: '02 NOV', l: 'Check-out e dia livre' },
               ].map(stat => (
                 <motion.div key={stat.l} variants={fadeUp}>
                   <p className="display" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: '#FF7B00', marginBottom: '0.35rem' }}>{stat.n}</p>
@@ -355,7 +330,7 @@ export default function ExpedicaoLanding() {
               initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
               className="display" style={{ fontSize: 'clamp(1.8rem, 4.5vw, 3rem)', color: '#0A0A0A', marginBottom: '3rem', maxWidth: '640px' }}
             >
-              Três dias, cada um com o seu próprio ritmo.
+              Do pôr do sol às cachoeiras, com segunda-feira livre.
             </motion.h2>
 
             <div style={{ borderTop: '1px solid #EBEBEB' }}>
@@ -384,7 +359,7 @@ export default function ExpedicaoLanding() {
               initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
               style={{ fontSize: '1rem', color: '#777', marginBottom: '2.5rem', maxWidth: '520px' }}
             >
-              Os cards abaixo já foram postados no nosso Instagram com todos os detalhes. Clique em qualquer um pra ampliar e ler.
+              Enquanto os novos conteúdos estão sendo preparados, relembre alguns registros da edição anterior. Clique em qualquer imagem para ampliar.
             </motion.p>
           </div>
 
@@ -517,13 +492,13 @@ export default function ExpedicaoLanding() {
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
             className="display" style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', color: '#fff', marginBottom: '1.25rem' }}
           >
-            Bora pra Campos?
+            Bora pro Caminho das Cachoeiras?
           </motion.h2>
           <motion.p
             initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}
             style={{ color: 'rgba(255,255,255,0.65)', fontSize: '1.05rem', maxWidth: '480px', marginBottom: '2.5rem', lineHeight: 1.7 }}
           >
-            Vagas limitadas para a expedição de agosto em Campos do Jordão. Garanta a sua antes que a turma feche.
+            Vagas limitadas para garantir a segurança e a estrutura do grupo. Garanta seu lugar entre Campos do Jordão e Santo Antônio do Pinhal.
           </motion.p>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} variants={fadeUp}>
             <Link to="/inscricao" className="btn-primary" style={{ padding: '1.15rem 2.75rem', fontSize: '0.78rem' }}>

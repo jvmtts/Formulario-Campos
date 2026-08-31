@@ -3,122 +3,227 @@
 @import "tailwindcss";
 
 @theme {
-  --color-white:   #FFFFFF;
-  --color-off:     #F7F7F5;
-  --color-light:   #EBEBEB;
-  --color-border:  #DEDEDE;
-  --color-muted:   #777777;
-  --color-dark:    #1C1C1C;
-  --color-black:   #0A0A0A;
-  --color-brand:   #FF7B00;
-  --color-brand-d: #D96600;
+  --color-white: #ffffff;
+  --color-off: #f7f7f5;
+  --color-light: #ebebeb;
+  --color-border: #dedede;
+  --color-muted: #777777;
+  --color-dark: #1c1c1c;
+  --color-black: #0a0a0a;
+  --color-brand: #ff7b00;
+  --color-brand-d: #d96600;
 
   --font-display: 'Montserrat', sans-serif;
-  --font-body:    'Inter', sans-serif;
-  --font-mono:    'Space Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Space Mono', monospace;
 
   @keyframes marquee {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
   }
+
   @keyframes pulse-dot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.35; transform: scale(0.55); }
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.35;
+      transform: scale(0.55);
+    }
   }
+
   @keyframes fade-up {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
 
 body {
-  background: #fff;
-  color: #0A0A0A;
+  background: #ffffff;
+  color: #0a0a0a;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
-::selection { background: #FF7B00; color: #fff; }
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: #F7F7F5; }
-::-webkit-scrollbar-thumb { background: #DEDEDE; }
-::-webkit-scrollbar-thumb:hover { background: #999; }
+::selection {
+  background: #ff7b00;
+  color: #ffffff;
+}
 
-/* ── Typography ─────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f7f7f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dedede;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}
+
+/* Tipografia */
+
 .display {
   font-family: 'Montserrat', sans-serif;
   font-weight: 900;
   line-height: 0.92;
   letter-spacing: -0.025em;
 }
-.mono { font-family: 'Space Mono', monospace; }
 
-/* ── Buttons ────────────────────────────────────────── */
+.mono {
+  font-family: 'Space Mono', monospace;
+}
+
+/* Botões */
+
 .btn-primary {
-  display: inline-flex; align-items: center; gap: .5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 1rem 2.5rem;
-  background: #FF7B00; color: #fff;
-  font-family: 'Inter', sans-serif; font-weight: 700;
-  font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
-  transition: background .2s, transform .15s;
-  text-decoration: none; border: none; cursor: pointer;
+  background: #ff7b00;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
   white-space: nowrap;
 }
-.btn-primary:hover  { background: #D96600; }
-.btn-primary:active { transform: scale(.97); }
+
+.btn-primary:hover {
+  background: #d96600;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
 
 .btn-dark {
-  display: inline-flex; align-items: center; gap: .5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 1rem 2.5rem;
-  background: #0A0A0A; color: #fff;
-  font-family: 'Inter', sans-serif; font-weight: 700;
-  font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
-  transition: background .2s, transform .15s;
-  text-decoration: none; border: none; cursor: pointer;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
   white-space: nowrap;
 }
-.btn-dark:hover  { background: #1C1C1C; }
-.btn-dark:active { transform: scale(.97); }
+
+.btn-dark:hover {
+  background: #1c1c1c;
+}
+
+.btn-dark:active {
+  transform: scale(0.97);
+}
 
 .btn-outline {
-  display: inline-flex; align-items: center; gap: .5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 1rem 2.5rem;
-  border: 1.5px solid #0A0A0A; color: #0A0A0A;
-  font-family: 'Inter', sans-serif; font-weight: 700;
-  font-size: .75rem; letter-spacing: .12em; text-transform: uppercase;
-  background: transparent; text-decoration: none; cursor: pointer;
-  transition: background .2s, color .2s, transform .15s;
+  border: 1.5px solid #0a0a0a;
+  color: #0a0a0a;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.15s;
   white-space: nowrap;
 }
-.btn-outline:hover  { background: #0A0A0A; color: #fff; }
-.btn-outline:active { transform: scale(.97); }
 
-/* ── Labels ─────────────────────────────────────────── */
+.btn-outline:hover {
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+.btn-outline:active {
+  transform: scale(0.97);
+}
+
+/* Labels */
+
 .eyebrow {
   font-family: 'Space Mono', monospace;
   font-weight: 700;
   font-size: clamp(0.92rem, 1.7vw, 1.1rem);
-  letter-spacing: .16em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #FF7B00;
+  color: #ff7b00;
   display: block;
 }
+
 .eyebrow-dark {
   font-family: 'Space Mono', monospace;
   font-weight: 700;
   font-size: clamp(0.92rem, 1.7vw, 1.1rem);
-  letter-spacing: .16em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #777;
+  color: #777777;
   display: block;
 }
 
-/* ── Layout ─────────────────────────────────────────── */
+/* Layout */
+
 .wrap {
   width: 100%;
   max-width: 1400px;
@@ -128,58 +233,309 @@ body {
   padding-right: clamp(1.5rem, 5vw, 7rem);
 }
 
-/* ── Section spacing ────────────────────────────────── */
-.section { padding: clamp(5rem, 10vh, 9rem) 0; }
-.section-lg { padding: clamp(7rem, 13vh, 11rem) 0; }
+.section {
+  padding: clamp(5rem, 10vh, 9rem) 0;
+}
 
-/* ── Landing da Expedição (galeria do Instagram) ─────── */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.section-lg {
+  padding: clamp(7rem, 13vh, 11rem) 0;
+}
 
-.post-card-overlay { opacity: 0; }
-button:hover .post-card-overlay { opacity: 1; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
-/* ── Grid de fotos da expedição (3 colunas fixas, colapsa no mobile) ── */
+/* Landing preservada */
+
+.landing-poster-hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1672 / 935;
+  overflow: hidden;
+  background: #050706;
+}
+
+.landing-poster-hero__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.landing-poster-hero__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(5, 7, 6, 0.5) 0%, transparent 19%),
+    linear-gradient(0deg, rgba(5, 7, 6, 0.3) 0%, transparent 16%);
+}
+
+.landing-hero-action {
+  position: relative;
+  z-index: 2;
+  border-top: 2px solid #00afc1;
+  background: #090b0b;
+  color: #ffffff;
+}
+
+.landing-hero-action__inner {
+  min-height: 118px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.landing-hero-action__date {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #00c2d4;
+  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.landing-hero-action__place {
+  color: rgba(255, 255, 255, 0.74);
+  font-size: clamp(0.9rem, 1.3vw, 1rem);
+  line-height: 1.55;
+}
+
+.landing-hero-action__button {
+  flex-shrink: 0;
+}
+
+.event-date-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* Hero do formulário */
+
+.form-poster-hero {
+  position: relative;
+  min-height: clamp(430px, 30vw, 540px);
+  padding-top: clamp(4rem, 10vh, 7rem);
+  padding-bottom: clamp(3rem, 6vh, 5rem);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  background: #0a0a0a;
+}
+
+.form-poster-hero__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  opacity: 0.58;
+}
+
+.form-poster-hero__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(10, 10, 10, 0.86) 0%,
+    rgba(10, 10, 10, 0.28) 58%,
+    rgba(10, 10, 10, 0.22) 100%
+  );
+}
+
+.form-poster-hero__brands {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  justify-content: center;
+  width: 100%;
+}
+
+.form-poster-hero__clearance {
+  width: clamp(320px, 38vw, 620px);
+  height: clamp(120px, 16vw, 220px);
+  flex: 0 1 auto;
+}
+
+/*
+  O botão Voltar continua no formulário, mas fica oculto enquanto
+  somente o formulário estiver publicado.
+*/
+
+.form-poster-hero > a {
+  display: none !important;
+}
+
+/* Identificação centralizada do formulário */
+
+.form-event-strip {
+  border-top: 2px solid #00afc1;
+  border-bottom: 1px solid #e7e7e7;
+  background: #ffffff;
+}
+
+.form-event-strip__inner {
+  min-height: 82px;
+  padding: 1rem clamp(1.5rem, 5vw, 7rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.38rem;
+  text-align: center;
+}
+
+.form-event-strip__inner > * {
+  display: none;
+}
+
+.form-event-strip__inner::before {
+  content: 'EXPEDIÇÃO CAMINHO DAS CACHOEIRAS';
+  color: #0a0a0a;
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(0.82rem, 1.15vw, 1rem);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.form-event-strip__inner::after {
+  content: '30 OUT · 01 NOV 2026  ·  SAÍDA DE SÃO PAULO';
+  color: #8a8a8a;
+  font-size: 0.66rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.form-event-strip__title,
+.form-event-strip__meta {
+  display: none;
+}
+
+/* Galeria da landing preservada */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.post-card-overlay {
+  opacity: 0;
+}
+
+button:hover .post-card-overlay {
+  opacity: 1;
+}
+
 .fotos-expedicao-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
 }
+
 @media (max-width: 860px) {
-  .fotos-expedicao-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 560px) {
-  .fotos-expedicao-grid { grid-template-columns: 1fr; }
+  .fotos-expedicao-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* =========================================
-   AJUSTES MOBILE - EXPEDIÇÃO
-   ========================================= */
+@media (max-width: 560px) {
+  .fotos-expedicao-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsividade */
+
 @media (max-width: 768px) {
-  /* Adiciona respiro nas laterais e remove a margem do desktop */
+  .landing-poster-hero__shade {
+    background: linear-gradient(
+      180deg,
+      rgba(5, 7, 6, 0.22) 0%,
+      transparent 28%
+    );
+  }
+
+  .landing-hero-action__inner {
+    min-height: 0;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+
+  .landing-hero-action__button {
+    justify-content: center;
+  }
+
+  .event-date-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-poster-hero {
+    min-height: 380px;
+  }
+
+  .form-poster-hero__brands {
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .form-poster-hero__clearance {
+    display: none;
+  }
+
+  .form-event-strip__inner {
+    min-height: 96px;
+    padding: 1.15rem 1.5rem;
+  }
+
+  .form-event-strip__inner::before {
+    max-width: 19rem;
+  }
+
+  .form-event-strip__inner::after {
+    max-width: 20rem;
+  }
+
   .wrap-mobile-pad {
     margin-left: 0 !important;
     padding-left: 1.5rem !important;
     padding-right: 1.5rem !important;
   }
 
-  /* Reseta apenas a margem (útil para o carrossel que já tem padding interno) */
   .reset-margin-mobile {
     margin-left: 0 !important;
   }
 
-  /* O QUE ESTÁ INCLUSO: Empilha os cards em 1 coluna */
   .grid-inclusos-mobile {
     grid-template-columns: 1fr !important;
   }
 
-  /* ROTEIRO DIA A DIA: Força a coluna e garante Imagem em cima, Texto embaixo */
   .roteiro-card-mobile {
     flex-direction: column !important;
     gap: 2rem !important;
     padding-top: 2rem !important;
     padding-bottom: 2rem !important;
   }
+
   .roteiro-card-mobile > div {
     flex: 1 1 auto !important;
     min-width: 100% !important;
