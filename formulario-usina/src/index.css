@@ -399,7 +399,7 @@ body {
 }
 
 .form-event-strip__inner::before {
-  content: 'EXPEDIÇÃO CAMINHO DAS CACHOEIRAS';
+  content: 'EXPEDIÇÃO MONTE VERDE';
   color: #0a0a0a;
   font-family: 'Space Mono', monospace;
   font-size: clamp(0.82rem, 1.15vw, 1rem);
@@ -410,7 +410,7 @@ body {
 }
 
 .form-event-strip__inner::after {
-  content: '30 OUT · 01 NOV 2026  ·  SAÍDA DE SÃO PAULO';
+  content: '06 · 08 NOV 2026  ·  SAÍDA DE SÃO PAULO';
   color: #8a8a8a;
   font-size: 0.66rem;
   font-weight: 600;

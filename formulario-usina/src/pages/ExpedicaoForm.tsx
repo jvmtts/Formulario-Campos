@@ -6,7 +6,7 @@ import {
   User, ChevronDown, Upload, X, AlertCircle
 } from 'lucide-react'
 
-const FORM_HERO_IMAGE = '/images/CamposFormulario.png?v=20260831-form'
+const FORM_HERO_IMAGE = '/images/MonteVerde.png'
 
 /* ── Tipos ───────────────────────────────────────────────────────── */
 interface Acompanhante {
@@ -954,7 +954,7 @@ export default function ExpedicaoForm() {
   /* ── Envio para o Formspree ──────────────────────────────────── */
   // Monta os campos de texto (sempre enviados)
   const montarCamposTexto = (formData: FormData) => {
-    formData.append('_subject', `Nova inscrição — ${data.nome} (Caminho das Cachoeiras 2026)`)
+    formData.append('_subject', `Nova inscrição — ${data.nome} (Expedição Monte Verde 2026)`)
 
     formData.append('Tipo de Inscrição', data.tipoInscricao === 'individual' ? 'Piloto Individual' : 'Piloto + Acompanhante')
     formData.append('Nome', data.nome)
@@ -1009,7 +1009,7 @@ export default function ExpedicaoForm() {
     }
   }
 
-  const BASIN_ENDPOINT = 'https://usebasin.com/f/80e03fc53775'
+  const BASIN_ENDPOINT = 'https://usebasin.com/f/52f4bd4c726f'
 
   const handleEnviar = async () => {
     setEnviando(true)
@@ -1058,7 +1058,7 @@ export default function ExpedicaoForm() {
             </motion.div>
           </div>
           <motion.h2 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.35, ease: [0.16, 1, 0.3, 1] }} style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 900, fontSize: 'clamp(2rem,5vw,3rem)', color: '#0A0A0A', lineHeight: 0.95, letterSpacing: '-0.025em', marginBottom: '1.25rem' }}>INSCRIÇÃO ENVIADA!</motion.h2>
-          <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }} style={{ color: '#777', fontSize: '1rem', lineHeight: 1.8, marginBottom: '2rem' }}>Recebemos sua inscrição para o <strong style={{ color: '#0A0A0A' }}>Caminho das Cachoeiras</strong>, entre Campos do Jordão e Santo Antônio do Pinhal. Nossa equipe entrará em contato em breve com os detalhes e o valor final conforme o número de acompanhantes.</motion.p>
+          <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5, ease: [0.16, 1, 0.3, 1] }} style={{ color: '#777', fontSize: '1rem', lineHeight: 1.8, marginBottom: '2rem' }}>Recebemos sua inscrição para a <strong style={{ color: '#0A0A0A' }}>Expedição Monte Verde</strong>, de 6 a 8 de novembro de 2026. Nossa equipe entrará em contato em breve com os detalhes e o valor final conforme o número de acompanhantes.</motion.p>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.75 }} style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' as const, color: '#BBB' }}>Você já pode fechar esta guia</motion.p>
         </motion.div>
       </div>
@@ -1073,7 +1073,7 @@ export default function ExpedicaoForm() {
         <div style={{ position: 'absolute', inset: 0 }}>
           <img
             src={FORM_HERO_IMAGE}
-            alt="Expedição Caminho das Cachoeiras"
+            alt="Expedição Monte Verde"
             className="form-poster-hero__image"
             loading="eager"
             fetchPriority="high"
@@ -1131,9 +1131,9 @@ export default function ExpedicaoForm() {
         <div className="form-event-strip__inner">
           <span className="mono">Formulário de inscrição</span>
           <span className="form-event-strip__divider" aria-hidden />
-          <span>30 OUT · 01 NOV 2026</span>
-          <span className="form-event-strip__detail">Saída de São Paulo</span>
-        </div>
+          <span>06 · 08 NOV 2026</span>
+          <span className="form-event-strip__detail">Monte Verde · Saída de São Paulo</span>
+        </div>  
       </section>
 
       {/* ── FORMULÁRIO ───────────────────────────────────────── */}
